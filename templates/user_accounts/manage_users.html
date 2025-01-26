@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- User Table -->
+<div class="card mb-4">
+  <div class="card-header">
+    <h3 class="card-title">User List</h3>
+
+    <div class="card-tools">
+      <div class="btn-group mb-2" role="group" aria-label="Basic outlined example">
+        <a href="/add_user">
+          <button type="button" class="btn btn-sm btn-outline-primary">Add New User</button>
+        </a>
+      </div>
+    </div>
+  </div> <!-- /.card-header -->
+
+  <div class="card-body">
+    <table class="table myTable" id="myTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Username</th>
+          <th>Password</th>
+          <th>Role</th>
+          <th>Edit</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr class="gradeX">
+          <td>{{ user.id }}</td>
+          <td>{{ user.username }}</td>
+          <td>{{ user.password }}</td>
+          <td>{{ user.role }}</td>
+
+          <!-- Edit Button -->
+          <td>
+            <a href="/edit_user/{{ user.id }}">
+              <button type="button" class="btn btn-warning" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
+                Edit
+              </button>
+            </a>
+          </td>
+
+          <!-- Delete Button -->
+          <td>
+            <a href="/delete_user/{{ user.id }}">
+              <button type="button" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete {{ user.username }}?')" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
+                Delete
+              </button>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div> <!-- /.card-body -->
+</div> <!-- /.card -->
+
+{% endblock %}

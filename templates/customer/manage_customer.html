@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Customer Table -->
+<div class="card mb-4">
+  <div class="card-header">
+    <h3 class="card-title">Customer List</h3>
+
+    <div class="card-tools">
+      <div class="btn-group mb-2" role="group" aria-label="Basic outlined example">
+        <a href="/add_customer">
+          <button type="button" class="btn btn-sm btn-outline-primary">Add Customer</button>
+        </a>
+        <a href="/sale">
+          <button type="button" class="btn btn-sm btn-outline-primary">Add Sale</button>
+        </a>
+      </div>
+    </div>
+  </div> <!-- /.card-header -->
+
+  <div class="card-body">
+    <table class="table myTable" id="myTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Contact</th>
+          <th>Address</th>
+          <th>Edit</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in customer %}
+        <tr class="gradeX">
+          <td>{{ i.name }}</td>
+          <td>{{ i.contact }}</td>
+          <td>{{ i.address }}</td>
+
+          <!-- Edit Button -->
+          <td>
+            <a href="/edit_customer/{{ i.CustomerID }}">
+              <button type="button" class="btn btn-warning" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
+                Edit
+              </button>
+            </a>
+          </td>
+
+          <!-- Delete Button -->
+          <td>
+            <a href="/delete_customer/{{ i.CustomerID }}">
+              <button type="button" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete {{ i.name }}?')" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
+                Delete
+              </button>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div> <!-- /.card-body -->
+</div> <!-- /.card -->
+
+{% endblock %}

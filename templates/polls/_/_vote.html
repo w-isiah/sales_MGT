@@ -1,0 +1,48 @@
+{% extends '_base.html' %}
+
+{% block content %}
+<div class="app-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="col-12">
+                    <div class="card card-primary card-outline">
+                        <div class="card-header">
+                            <h4 class="card-title">
+                                Edit Poll Options
+                            </h4>
+                        </div>
+
+                        <div class="card-body">
+                            {% if options %}
+                            <form method="POST">
+                                <fieldset class="row mb-3">
+                                    <legend class="col-form-label col-sm-2 pt-0">
+                                        Poll Options
+                                    </legend>
+                                    <div class="col-sm-10">
+                                        {% for option in options %}
+                                        <!-- Option input fields for each option -->
+                                        <div class="form-group">
+                                            <label for="option_{{ option.id }}">Option {{ loop.index }}:</label>
+                                            <input class="form-control" type="text" id="option_{{ option.id }}" name="option_{{ option.id }}" value="{{ option.option_text }}">
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </fieldset>
+
+                                <button type="submit" class="btn btn-success">
+                                    Update Options
+                                </button>
+                            </form>
+                            {% else %}
+                            <p class="alert alert-warning">There are no options available for this poll. Please check back later.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

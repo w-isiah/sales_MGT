@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="title" content="Polls Management - Login">
+    <meta name="author" content="Polls MGT">
+    <meta name="description" content="AdminLTE based Login page for Polls Management system.">
+    <meta name="keywords" content="polls, login, AdminLTE, dashboard, management, bootstrap, secure">
+
+    <!-- External Fonts -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css" integrity="sha256-tXJfXfp6Ewt1ilPzLDtQnJV4hclT9XuaZUKyUvmyr+Q=" crossorigin="anonymous">
+
+    <!-- Overlay Scrollbars CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.3.0/styles/overlayscrollbars.min.css" integrity="sha256-dSokZseQNT08wYEWiz5iLI8QPlKxG+TswNRD8k35cpg=" crossorigin="anonymous">
+
+    <!-- Bootstrap Icons CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.min.css" integrity="sha256-Qsx5lrStHZyR9REqhUF8iQt73X06c8LGIUPzpOhwRrI=" crossorigin="anonymous">
+
+    <!-- AdminLTE CSS -->
+    <link rel="stylesheet" href="../../static/css/adminlte.css">
+
+    <title>Polls Management - Register</title>
+
+    <!-- Custom Styles for Flash Messages -->
+    <style>
+        .flash-message {
+            margin-bottom: 15px;
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1050;
+            width: 90%;
+        }
+    </style>
+
+</head>
+
+<body class="login-page bg-body-secondary">
+    <div class="login-box">
+        <!-- Card Structure -->
+        <div class="card card-outline card-primary">
+
+            <!-- Flash Messages Section -->
+            <div class="row">
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-success alert-dismissible fade show flash-message" role="alert">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    {{ message }}
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+            </div>
+
+            <!-- Card Header -->
+            <div class="card-header">
+                <a href="../index2.html" class="link-dark text-center">
+                    <h1 class="mb-0"><b>Polls</b> MGT</h1>
+                </a>
+            </div>
+
+            <!-- Card Body -->
+            <div class="card-body login-card-body">
+                <p class="login-box-msg">Sign up to create your account</p>
+                <!-- Registration Form -->
+                <form action="{{ url_for('register') }}" method="post">
+                    <!-- Username Input -->
+                    <div class="input-group mb-1">
+                        <div class="form-floating">
+                            <input id="username" name="username" type="text" class="form-control" placeholder="Username" required>
+                            <label for="username">Username</label>
+                        </div>
+                        <div class="input-group-text">
+                            <span class="bi bi-person"></span>
+                        </div>
+                    </div>
+
+                    <!-- Email Input -->
+                    <div class="input-group mb-1">
+                        <div class="form-floating">
+                            <input id="email" name="email" type="email" class="form-control" placeholder="Email Address" required>
+                            <label for="email">Email Address</label>
+                        </div>
+                        <div class="input-group-text">
+                            <span class="bi bi-envelope"></span>
+                        </div>
+                    </div>
+
+                    <!-- Gender Selection -->
+                    <div class="col-md-6">
+                        <div class="row mb-3">
+                            <label for="gender" class="form-label">Gender</label>
+                            <select class="form-select" id="sex" name="sex" required>
+                                <option selected disabled value="">Choose...</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- College Input -->
+                    <div class="input-group mb-1">
+                        <div class="form-floating">
+                            <input id="college" name="college" type="text" class="form-control" placeholder="College" required>
+                            <label for="college">College</label>
+                        </div>
+                        <div class="input-group-text">
+                            <span class="bi bi-building"></span>
+                        </div>
+                    </div>
+
+                    <!-- College Input -->
+                    <div class="input-group mb-1">
+                        <div class="form-floating">
+                            <input id="programme" name="programme" type="text" class="form-control" placeholder="programme" required>
+                            <label for="college">Programme</label>
+                        </div>
+                        <div class="input-group-text">
+                            <span class="bi bi-building"></span>
+                        </div>
+                    </div>
+
+                    <!-- Registration Number Input -->
+                    <div class="input-group mb-1">
+                        <div class="form-floating">
+                            <input id="registration_number" name="registration_number" type="text" class="form-control" placeholder="Registration Number" required>
+                            <label for="registration_number">Registration Number</label>
+                        </div>
+                        <div class="input-group-text">
+                            <span class="bi bi-card-checklist"></span>
+                        </div>
+                    </div>
+
+                    <!-- Password Input -->
+                    <div class="input-group mb-1">
+                        <div class="form-floating">
+                            <input id="password" name="password" type="password" class="form-control" placeholder="Password" required>
+                            <label for="password">Password</label>
+                        </div>
+                        <div class="input-group-text">
+                            <span class="bi bi-lock-fill"></span>
+                        </div>
+                    </div>
+
+                    <!-- Confirm Password Input -->
+                    <div class="input-group mb-1">
+                        <div class="form-floating">
+                            <input id="confirmPassword" name="confirmPassword" type="password" class="form-control" placeholder="Confirm Password" required>
+                            <label for="confirmPassword">Confirm Password</label>
+                        </div>
+                        <div class="input-group-text">
+                            <span class="bi bi-lock-fill"></span>
+                        </div>
+                    </div>
+
+                    <!-- Password Visibility Toggle -->
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="showPassword">
+                        <label class="form-check-label" for="showPassword">Show Password</label>
+                    </div>
+
+                    <!-- Password Match Validation -->
+                    <script>
+                        document.getElementById("confirmPassword").addEventListener("input", function() {
+                            const password = document.getElementById("password").value;
+                            const confirmPassword = document.getElementById("confirmPassword").value;
+                            if (confirmPassword !== password) {
+                                document.getElementById("confirmPassword").setCustomValidity("Passwords do not match.");
+                            } else {
+                                document.getElementById("confirmPassword").setCustomValidity("");
+                            }
+                        });
+
+                        // Toggle Password Visibility
+                        document.getElementById("showPassword").addEventListener("change", function() {
+                            const passwordField = document.getElementById("password");
+                            const confirmPasswordField = document.getElementById("confirmPassword");
+
+                            // Toggle the input type between "password" and "text"
+                            if (this.checked) {
+                                passwordField.type = "text";
+                                confirmPasswordField.type = "text";
+                            } else {
+                                passwordField.type = "password";
+                                confirmPasswordField.type = "password";
+                            }
+                        });
+                    </script>
+
+                    <!-- Submit Button -->
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">Register</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Register Link -->
+                    <p>
+                        <a href="/login">Login if You have an account already</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Third Party Plugin (OverlayScrollbars) -->
+    <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.3.0/browser/overlayscrollbars.browser.es6.min.js" integrity="sha256-H2VM7BKda+v2Z4+DRy69uknwxjyDRhszjXFhsL4gD3w=" crossorigin="anonymous"></script>
+
+    <!-- Bootstrap and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha256-whL0tQWoY1Ku1iskqPFvmZ+CHsvmRWx/PIoEvIeWh4I=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha256-YMa+wAM6QkVyz999odX7lPRxkoYAan8suedu4k2Zur8=" crossorigin="anonymous"></script>
+
+    <!-- AdminLTE JavaScript -->
+    <script src="../../static/js/adminlte.js"></script>
+</body>
+
+</html>

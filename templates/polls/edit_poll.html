@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="app-content"> <!--begin::Container-->
+    <div class="container-fluid"> <!-- Timeline example -->
+        <div class="row">
+            <div class="col-12"> <!-- The icons -->
+                <div class="col-12">
+                    <div class="card card-primary card-outline">
+                        <div class="card-header">
+                            <h3 class="card-title">Edit Poll - {{ poll_id }}</h3>
+                            <div class="card-tools">
+                                <div class="btn-group mb-2" role="group" aria-label="Basic outlined example"> <a href="/manage_polls"><button type="button" class="btn btn-outline-primary">View Polls</button></a>  </div>
+
+                            </div>
+
+                            
+                        </div>
+
+                        <div class="card-body">
+                           <form method="POST">
+                            <div class="form-group">
+                                <div class="row mb-3"> <label for="question" class="col-sm-2 col-form-label">Type Option Name</label>
+                                    <div class="col-sm-10"> <input type="text" name="option" class="form-control" id="option"> </div>
+                                </div>
+
+
+                            </div>
+                            <button type="submit" class="btn btn-primary">Add Option</button>
+                            
+                        </form>
+
+                        <h4>Existing Options:</h4>
+                        <ul>
+                            {% for option in options %}
+                            <li>{{ option.option_text }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- /.col -->
+    </div> <!-- /.row -->
+</div> <!--end::Container-->
+</div> <!--end::App Content-->
+{% endblock %}

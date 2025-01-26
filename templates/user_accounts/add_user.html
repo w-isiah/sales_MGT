@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Add User Form -->
+<div class="card mb-4">
+  <div class="card-header">
+    <h3 class="card-title">Add User</h3>
+
+    <div class="card-tools">
+      <a href="/manage_users" class="btn btn-sm btn-outline-primary">
+        <i class="icon-plus"></i> Back to Users
+      </a>
+    </div>
+  </div> <!-- /.card-header -->
+
+  <div class="card-body">
+    <div class="widget-content nopadding">
+      <form action="/add_user" method="POST" class="form-horizontal">
+
+        <!-- Username Input -->
+        <div class="row mb-3">
+          <label for="username" class="col-sm-2 col-form-label">Username:</label>
+          <div class="col-sm-10">
+            <input type="text" name="username" class="form-control" placeholder="Enter Username" required />
+          </div>
+        </div>
+
+        <!-- Password Input -->
+        <div class="row mb-3">
+          <label for="password" class="col-sm-2 col-form-label">Password:</label>
+          <div class="col-sm-10">
+            <input type="password" name="password" class="form-control" placeholder="Enter Password" required />
+          </div>
+        </div>
+
+        <!-- Role Dropdown -->
+        <div class="row mb-3">
+          <label for="role" class="col-sm-2 col-form-label">Role:</label>
+          <div class="col-sm-10">
+            <select name="role" class="form-control" required>
+              <option value="" selected disabled>Select a Role</option>
+              <option value="admin">Admin</option>
+              <option value="School Practice Supervisor">School Practice Supervisor</option>
+              <option value="Dean">Dean</option>
+              <option value="Head Of Department">Head Of Department</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-actions">
+          <button type="submit" class="btn btn-sm btn-success">Add User</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div> <!-- /.card-body -->
+
+{% endblock %}

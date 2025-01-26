@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+
+<div class="app-content"> <!--begin::Container-->
+    <div class="container-fluid"> <!-- Timelime example  -->
+        <div class="row">
+            <div class="col-12"> <!-- The icons -->
+                <div class="col-12">
+                    <div class="card card-primary card-outline">
+                        <div class="card-header">
+                            <h4 class="card-title">Vote For a Poll</h4>
+                        </div>
+
+                        <div class="card-body">
+                            <!-- Check if options exist -->
+                            {% if options %}
+                            <form method="POST">
+
+                                <fieldset class="row mb-3">
+                                    <legend class="col-form-label col-sm-2 pt-0">Select an Option</legend>
+                                    <div class="col-sm-10">
+                                        <!-- Loop through options and display radio buttons -->
+                                        {% for option in options %}
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="option_id" id="option_{{ option.id }}" value="{{ option.id }}" checked>
+                                            <label class="form-check-label" for="option_{{ option.id }}">
+                                                {{ option.option_text }}
+                                            </label>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </fieldset>
+
+                                <!-- Submit Button -->
+                                <button type="submit" class="btn btn-primary">Submit Vote</button>
+                            </form>
+                            {% else %}
+                            <p>No options available for this poll.</p>
+                            {% endif %}
+                            <!-- End: Poll Voting Section -->
+
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- /.col -->
+    </div> <!-- /.row -->
+</div> <!--end::Container-->
+</div> <!--end::App Content-->
+{% endblock %}

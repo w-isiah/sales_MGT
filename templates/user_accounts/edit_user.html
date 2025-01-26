@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Edit User Form -->
+<div class="card mb-4">
+  <div class="card-header">
+    <h3 class="card-title">Edit User</h3>
+
+    <div class="card-tools">
+      <a href="/manage_users" class="btn btn-sm btn-outline-success">
+        <i class="icon-refresh"></i> View Users
+      </a>
+    </div>
+  </div> <!-- /.card-header -->
+
+  <div class="card-body">
+    <div class="widget-content nopadding">
+      <form action="{{ url_for('edit_user', id=user.id) }}" method="POST" class="form-horizontal">
+
+        <!-- Username Input -->
+        <div class="row mb-3">
+          <label for="username" class="col-sm-2 col-form-label">Username:</label>
+          <div class="col-sm-10">
+            <input type="text" id="username" name="username" class="form-control" value="{{ user.username }}" required />
+          </div>
+        </div>
+
+        <!-- Password Input -->
+        <div class="row mb-3">
+          <label for="password" class="col-sm-2 col-form-label">Password:</label>
+          <div class="col-sm-10">
+            <input type="password" id="password" name="password" class="form-control" value="{{ user.password }}" required />
+          </div>
+        </div>
+
+        <!-- Role Dropdown -->
+        <div class="row mb-3">
+          <label for="role" class="col-sm-2 col-form-label">Role:</label>
+          <div class="col-sm-10">
+            <select id="role" name="role" class="form-control" required>
+              <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+              <option value="School Practice Supervisor" {% if user.role == 'School Practice Supervisor' %}selected{% endif %}>School Practice Supervisor</option>
+              <option value="Head Of Department" {% if user.role == 'Head Of Department' %}selected{% endif %}>Head Of Department</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Form Action Buttons -->
+        <div class="form-actions">
+          <button type="submit" id="submitBtn" class="btn btn-sm btn-success">Update</button>
+        </div>
+
+      </form>
+    </div>
+  </div> <!-- /.card-body -->
+
+</div> <!-- /.card -->
+
+{% endblock %}

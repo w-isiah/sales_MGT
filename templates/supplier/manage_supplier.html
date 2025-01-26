@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Supplier Table -->
+<div class="card card-primary card-outline mb-4"> <!--begin::Header-->
+    <div class="card-header">
+        <h3 class="card-title">Supplier List</h3>
+
+        <div class="card-tools">
+            <div class="btn-group mb-2" role="group" aria-label="Basic outlined example">
+                <a href="/add_supplier">
+                    <button type="button" class="btn btn-sm btn-outline-success"
+                    style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
+                    Add Supplier
+                    </button>
+                </a>
+                <a href="/sale">
+                    <button type="button" class="btn btn-sm btn-outline-primary"
+                    style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
+                     Sale
+                    </button>
+                </a>
+            </div>
+        </div>
+    </div> <!-- /.card-header -->
+
+    <div class="card-body">
+        <table class="table myTable" id="myTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Contact</th>
+                    <th>Address</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in supplier %}
+                <tr class="gradeX">
+                    <td>{{ i.supplier_name | default('N/A') }}</td>
+                    <td>{{ i.contact | default('N/A') }}</td>
+                    <td>{{ i.address | default('N/A') }}</td>
+
+                    <!-- Edit Button -->
+                    <td>
+                        <a href="/edit_supplier/{{ i.SupplierID }}"><button type="button" class="btn btn-sm btn-warning"
+                    style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
+                            Edit </button>
+                        </a>
+                    </td>
+
+                    <!-- Delete Button -->
+                    <td>
+                        <a href="/delete_supplier/{{i.SupplierID}}" ><button type="button" onclick="return confirm('Are you sure you want to delete {{i.supplier_name}}.?')" class="btn btn-sm btn-danger"
+                    style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
+                            Delete </button>
+                        </a>
+                    </td>
+                </tr>
+
+                {% endfor %}
+            </tbody>
+        </table>
+    </div> <!-- /.card-body -->
+</div> <!-- /.card -->
+
+{% endblock %}

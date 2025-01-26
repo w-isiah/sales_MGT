@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="app-content"> <!-- Begin: Container -->
+    <div class="container-fluid"> <!-- Timeline Example -->
+        <div class="row">
+            <div class="col-12"> <!-- The Icons Section -->
+                <div class="col-12">
+                    <div class="card card-primary card-outline">
+                        <div class="card-header">
+                            <h4 class="card-title">Results for Poll #{{ poll_id }}</h4>
+                        </div>
+
+                        <div class="card-body">
+                            <ul class="list-unstyled" id="poll-results">
+                                {% for option in options %}
+                                    <li class="d-flex align-items-center mb-3" data-votes="{{ option.votes }}">
+                                        <!-- Display Option Text -->
+                                        <div class="mr-3" style="flex: 1;">
+                                            <span class="font-weight-bold">{{ option.option_text }}</span>
+                                        </div>
+                                        
+                                        <!-- Display Vote Count with Progress Bar -->
+                                        <div class="progress" style="flex: 2;">
+                                            <div class="progress-bar" role="progressbar" 
+                                                 style="width: {{ option.votes_percentage }}%;" 
+                                                 aria-valuenow="{{ option.votes_percentage }}" aria-valuemin="0" aria-valuemax="100">
+                                                <span class="text-white vote-count">{{ option.votes }} votes</span>
+                                            </div>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                            <a href="/" class="btn btn-outline-primary">Back to Home</a>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- /.col -->
+        </div> <!-- /.row -->
+    </div> <!-- End: Container -->
+</div> <!-- End: App Content -->
+{% endblock %}
+
+{% block styles %}
+<style>
+    /* Styling for the Back to Home button hover effect */
+    .btn-outline-primary:hover {
+        background-color: #007bff; /* Blue background on hover */
+        color: white; /* White text on hover */
+        text-decoration: none; /* Remove underline */
+    }
+
+    /* Custom styling for the progress bar and text */
+    .progress-bar {
+        background-color: #28a745; /* Green color for progress bars */
+        font-weight: bold; /* Bold text inside the progress bar */
+    }
+
+    .progress-bar span {
+        font-size: 12px; /* Smaller font size for votes text */
+        color: white; /* White text color inside progress bar */
+    }
+
+    /* Responsive List Items */
+    .d-flex {
+        display: flex;
+        align-items: center;
+    }
+
+    /* Space out the option text and the progress bar */
+    .mr-3 {
+        margin-right: 1rem;
+    }
+
+    .progress {
+        height: 25px;
+        border-radius: 5px;
+    }
+
+    .vote-count {
+        position: absolute;
+        top: -25px; /* Position the vote count above the progress bar */
+        left: 50%;
+        transform: translateX(-50%); /* Center the text horizontally */
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Wait until the document is fully loaded
+    document.addEventListener("DOMContentLoaded", function() {
+        // Find the highest vote count
+        let highestVotes = 0;
+        const pollResults = document.querySelectorAll('#poll-results li');
+
+        pollResults.forEach(function(item) {
+            const votes = parseInt(item.getAttribute('data-votes'));
+            if (votes > highestVotes) {
+                highestVotes = votes;
+            }
+        });
+
+        // Now adjust the position of the vote count
+        pollResults.forEach(function(item) {
+            const votes = parseInt(item.getAttribute('data-votes'));
+            const voteCountElem = item.querySelector('.vote-count');
+
+            if (votes === highestVotes) {
+                // Place the vote count above the highest votes
+                voteCountElem.style.top = '-35px';  // Adjust the distance as needed
+            }
+        });
+    });
+</script>
+{% endblock %}

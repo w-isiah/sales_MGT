@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Supplier Add Form -->
+<div class="card mb-4">
+  <div class="card-header">
+    <h3 class="card-title">Add Supplier</h3>
+
+    <div class="card-tools">
+      <div class="btn-group mb-2" role="group" aria-label="Basic outlined example">
+        <a href="/manage_supplier">
+          <button type="button" class="btn btn-sm btn-outline-primary"> View Suppliers</button>
+        </a>
+      </div>
+    </div>
+  </div> <!-- /.card-header -->
+
+  <div class="card-body">
+    <div class="widget-content nopadding">
+
+      <!-- Add Supplier Form -->
+      <form action="{{ url_for('add_supplier') }}" method="POST">
+
+        <!-- Supplier Name Input -->
+        <div class="row mb-3">
+          <label for="supplier_name" class="col-sm-2 col-form-label">Supplier Name: </label>
+          <div class="col-sm-10">
+            <input type="text" name="supplier_name" class="form-control" id="supplier_name" placeholder="Enter Supplier Name" required>
+          </div>
+        </div>
+
+        <!-- Contact Input -->
+        <div class="row mb-3">
+          <label for="contact" class="col-sm-2 col-form-label">Contact: </label>
+          <div class="col-sm-10">
+            <input type="tel" name="contact" class="form-control" id="contact" placeholder="Enter contact number" required pattern="\d{10}" title="Please enter a valid 10-digit phone number">
+            <span class="help-block">Only numeric values are allowed, and the phone number should be 10 digits long.</span>
+          </div>
+        </div>
+
+        <!-- Address Input -->
+        <div class="row mb-3">
+          <label for="address" class="col-sm-2 col-form-label">Address: </label>
+          <div class="col-sm-10">
+            <input type="text" name="address" class="form-control" id="address" placeholder="Enter Address" required>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-actions">
+          <button type="submit" class="btn btn-sm btn-success">Save Supplier</button>
+        </div>
+
+      </form> 
+    </div>
+  </div>
+</div> <!-- /.card-body -->
+
+{% endblock %}

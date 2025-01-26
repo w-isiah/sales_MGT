@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="app-content"> <!-- Begin: Container -->
+    <div class="container-fluid"> <!-- Timeline Example -->
+        <div class="row">
+            <div class="col-12"> <!-- The Icons Section -->
+                <div class="col-12">
+                    <div class="card card-primary card-outline">
+                        <div class="card-header">
+                            <h3 class="card-title">Polls</h3>
+                            <div class="card-tools">
+                                <div class="btn-group mb-2" role="group" aria-label="Basic outlined example">
+                                    <a href="#"><button type="button" class="btn btn-outline-primary">Home</button></a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <p>Select to Vote.</p> 
+                            <strong>Click on any of the links below. Voting is allowed only once.</strong>
+
+                            <div class="list-group">
+                                {% for poll in polls %}
+                                    <a href="/vote/{{ poll.id }}" class="list-group-item list-group-item-action">
+                                        {{ poll.question }}
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- /.col -->
+        </div> <!-- /.row -->
+    </div> <!-- End: Container -->
+</div> <!-- End: App Content -->
+
+{% block styles %}
+<style>
+    /* Hover effect for poll links */
+    .list-group-item:hover {
+        background-color: #007bff;  /* Blue background on hover */
+        color: white;  /* White text on hover */
+        text-decoration: none;  /* Remove underline */
+    }
+</style>
+{% endblock %}
+{% endblock %}

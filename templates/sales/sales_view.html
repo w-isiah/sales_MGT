@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Customer Table Section -->
+<div class="card mb-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h3 class="card-title">Customer List</h3>
+
+    <div class="btn-group mb-2" role="group" aria-label="Customer Management">
+      <a href="/manage_customer">
+        <button type="button" class="btn btn-sm btn-outline-primary">View Customers</button>
+      </a>
+      <a href="/sale">
+        <button type="button" class="btn btn-sm btn-outline-primary">Add Customer</button>
+      </a>
+    </div>
+  </div> <!-- /.card-header -->
+
+  <div class="card-body">
+    <!-- Date Filter Form -->
+    <div class="widget-content nopadding">
+      <form method="POST" action="{{ url_for('sales_view') }}" novalidate>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="start_date" class="control-label">Start Date:</label>
+            <input type="date" id="start_date" name="start_date" class="form-control" value="{{ start_date }}">
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="end_date" class="control-label">End Date:</label>
+            <input type="date" id="end_date" name="end_date" class="form-control" value="{{ end_date }}">
+          </div>
+        </div>
+
+        <div class="form-group text-right">
+          <button type="submit" class="btn  btn-sm btn-primary">Search</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div> <!-- /.card-body -->
+
+<!-- Sales Data Table Section -->
+<div class="card mb-4">
+  <div class="card-header">
+    <h5 class="card-title">Sales Data</h5>
+  </div>
+  
+  <div class="card-body">
+    {% if sales %}
+    <div class="table-responsive">
+       <table class="table myTable" id="myTable">
+        <thead>
+          <tr>
+            <th>Product Name</th>
+            <th>Customer Name</th>
+            <th>Unit Price</th>
+            <th>Discount</th>
+            <th>Quantity</th>
+            <th>Date Updated</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for sale in sales %}
+          <tr>
+            <td>{{ sale.product_name }}</td>
+            <td>{{ sale.customer_name }}</td>
+            <td>{{ sale.price }}</td>
+            <td>{{ sale.discount }}</td>
+            <td>{{ sale.qty }}</td>
+            <td>{{ sale.date_updated.strftime("%m-%d %H:%M") }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Sales Summary -->
+    <div class="mt-3">
+      <p><strong>Total Sales:</strong> {{ total_sales }}/=</p>
+      <p><strong>Total Quantity Sold:</strong> {{ total_quantity }} Items</p>
+    </div>
+
+    {% else %}
+    <p>No sales found for the selected date range.</p>
+    {% endif %}
+  </div>
+</div> <!-- /.card -->
+
+{% endblock %}
