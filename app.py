@@ -108,6 +108,21 @@ def login():
 
 
 
+@app.route('/logout')
+def logout():
+    """Logout route to clear session and redirect to login page."""
+    # Remove session variables
+    session.pop('loggedin', None)
+    session.pop('id', None)
+    session.pop('username', None)
+    session.pop('role', None)
+
+    # Redirect to login page after logout
+    return redirect(url_for('login'))
+
+
+
+
 # Start of customer handling
 @app.route('/manage_customer')
 def manage_customer():
