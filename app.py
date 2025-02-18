@@ -7,6 +7,11 @@ import os
 import random
 import traceback
 import re
+
+
+
+
+
 # Initialize the Flask app
 app = Flask(__name__)
 app.secret_key = 'mine1234'
@@ -34,47 +39,82 @@ def get_db_connection():
 def index():
     """Home route, redirects based on user role."""
     if 'loggedin' in session:
+        user_data = {
+            'username': session['username'],
+            'role': session['role']
+        }
+
         if session['role'] == "admin":
-            conn = get_db_connection()
-    
-            # Create a cursor to interact with the database
-            cursor = conn.cursor(dictionary=True)
+            total_sales_today = 0
+            highest_sale_today = 0
+            sales_quantity_today = 0
 
-            # Execute SQL query to get total sales for today
-            cursor.execute("""
-                SELECT 
-                    SUM(CASE 
-                        WHEN discounted_price IS NOT NULL THEN discounted_price
-                        ELSE total_price
-                    END) AS total_sales_today
-                FROM 
-                    sales
-                WHERE 
-                    DATE(date_updated) = CURDATE();
-            """)
+            try:
+                with get_db_connection() as conn:
+                    cursor = conn.cursor(dictionary=True)
 
-            # Fetch the result of the query
-            total_sales = cursor.fetchone()
+                    # Total sales for today
+                    cursor.execute("""
+                        SELECT 
+                            SUM(CASE 
+                                WHEN discounted_price IS NOT NULL THEN discounted_price
+                                ELSE total_price
+                            END) AS total_sales_today
+                        FROM 
+                            sales
+                        WHERE 
+                            DATE(date_updated) = CURDATE();
+                    """)
+                    total_sales = cursor.fetchone()
+                    total_sales_today = total_sales.get('total_sales_today', 0) or 0
 
-            # Ensure total_sales is not None and has the key 'total_sales_today'
-            if total_sales and 'total_sales_today' in total_sales:
-                total_sales_today = total_sales['total_sales_today']
-            else:
-                total_sales_today = 0  # Default to 0 if no data is found
+                    # Highest sale for today
+                    cursor.execute("""
+                        SELECT 
+                            product_id, 
+                            MAX(CASE 
+                                WHEN discounted_price IS NOT NULL THEN discounted_price
+                                ELSE total_price
+                            END) AS highest_sale_today
+                        FROM 
+                            sales
+                        WHERE 
+                            DATE(date_updated) = CURDATE()
+                        GROUP BY product_id
+                        ORDER BY highest_sale_today DESC
+                        LIMIT 1;
+                    """)
+                    highest_sale = cursor.fetchone()
+                    highest_sale_today = highest_sale['highest_sale_today'] if highest_sale else 0
 
-            # Render the template with the sales total and user info
+                    # Sales quantity for today
+                    cursor.execute("""
+                        SELECT 
+                            SUM(qty) AS sales_quantity_today
+                        FROM 
+                            sales
+                        WHERE 
+                            DATE(date_updated) = CURDATE();
+                    """)
+                    quantity = cursor.fetchone()
+                    sales_quantity_today = quantity['sales_quantity_today'] if quantity else 0
+
+            except Exception as e:
+                print(f"Error fetching total sales: {e}")
+            
+            # Pass the data to the frontend template
             return render_template('dashboard.html', 
                                    total_sales_today=total_sales_today,
-                                   username=session['username'], 
-                                   role=session['role'])
-        else:
-            # Render the dashboard for non-admin users
-            return render_template('dashboard.html', 
+                                   highest_sale_today=highest_sale_today,
+                                   sales_quantity_today=sales_quantity_today,
                                    username=session['username'], 
                                    role=session['role'])
     
-    # Redirect to login if not logged in
-    return redirect(url_for('login'))
+    # If not logged in, redirect or show an error page
+    return redirect(url_for('login'))  # Assuming you have a login route to redirect t
+
+
+
 
 
 
@@ -105,6 +145,21 @@ def login():
         else:
             msg = 'Incorrect username/password!'
     return render_template('user_accounts/login.html', msg=msg)
+
+
+
+@app.route('/logout')
+def logout():
+    """Logout route to clear session and redirect to login page."""
+    # Remove session variables
+    session.pop('loggedin', None)
+    session.pop('id', None)
+    session.pop('username', None)
+    session.pop('role', None)
+
+    # Redirect to login page after logout
+    return redirect(url_for('login'))
+
 
 
 
@@ -449,61 +504,167 @@ def delete_supplier(get_id):
     return redirect(url_for('manage_supplier'))
 
 
-
-# End of Supplier Management Routes
-
 @app.route('/manage_products', methods=['GET', 'POST'])
 def manage_products():
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
-    cursor.execute('SELECT * FROM product_list order by name')
+    
+    # Modify the query to include total_price calculation and sum the prices at the database level
+    cursor.execute('''
+        SELECT *, (quantity * price) AS total_price 
+        FROM product_list 
+        ORDER BY name
+    ''')
     products = cursor.fetchall()
+    
+    # Calculate the total sum and total price directly in Python (sum of total_price from database query)
+    total_sum = sum(product['total_price'] for product in products)
+    total_price = sum(product['price'] for product in products)
+
+    # Format total_sum and total_price with proper commas and two decimal places
+    formatted_total_sum = "{:,.2f}".format(total_sum) if total_sum else '0.00'
+    formatted_total_price = "{:,.2f}".format(total_price) if total_price else '0.00'
+
+    # Format each product's price and total_price
+    for product in products:
+        product['formatted_total_price'] = "{:,.2f}".format(product['total_price']) if product['total_price'] else '0.00'
+        product['formatted_price'] = "{:,.2f}".format(product['price']) if product['price'] else '0.00'
+    
+    # Clean up database resources
     cursor.close()
     connection.close()
-    return render_template('product/manage_product.html',username=session['username'], products=products)
+    
+    return render_template(
+        'product/manage_product.html', 
+        username=session['username'],  
+        formatted_total_price=formatted_total_price, 
+        products=products, 
+        formatted_total_sum=formatted_total_sum
+    )
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Define upload folder and allowed extensions
+UPLOAD_FOLDER = 'static/uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+# Ensure the upload folder exists
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+def allowed_file(filename):
+    """Check if the uploaded file has a valid extension."""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/add_product', methods=['GET', 'POST'])
 def add_product():
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
-    
-    # Fetch categories from the database (assuming a separate categories table)
-    cursor.execute('SELECT * FROM category_list')  # Replace with the correct table for categories
+
+    # Fetch categories from the database
+    cursor.execute('SELECT * FROM category_list')
     categories = cursor.fetchall()
-    
-    # Generate a random SKU for the product
-    random_num = random.randint(1005540, 9978799)  # This will be used as the SKU if not provided by the user
-    
+
+    # Generate a random SKU
+    random_num = random.randint(1005540, 9978799)
+
+    # Ensure the SKU is unique
+    while True:
+        cursor.execute('SELECT * FROM product_list WHERE sku = %s', (random_num,))
+        if not cursor.fetchone():
+            break  # Unique SKU found
+        random_num = random.randint(1005540, 9978799)
+
     if request.method == 'POST':
         # Retrieve form data
-        category_id = request.form.get('category_id')  # Ensure this matches the frontend form field name
-        sku = request.form.get('serial_no')  # SKU from form (this should be populated with the random SKU in the frontend)
+        category_id = request.form.get('category_id')
+        sku = request.form.get('serial_no') or random_num
         price = request.form.get('price')
         name = request.form.get('name')
         description = request.form.get('description')
         quantity = request.form.get('quantity')
         reorder_level = request.form.get('reorder_level')
 
-        # Check if the product already exists with the same SKU and category
-        cursor.execute('SELECT * FROM product_list WHERE category_id = %s AND sku = %s', (category_id, sku))
+        # Check for existing product with the same name in the selected category
+        cursor.execute('SELECT * FROM product_list WHERE category_id = %s AND name = %s', (category_id, name))
         existing_product = cursor.fetchone()
 
         if existing_product:
-            flash("This product with the same SKU already exists!")
+            flash("This product already exists in the selected category!", "danger")
         else:
-            # Insert new product into the product_list table
-            cursor.execute('INSERT INTO product_list (category_id, sku, price, name, description, quantity, reorder_level) VALUES (%s, %s, %s, %s, %s, %s, %s)', 
-                           (category_id, sku, price, name, description, quantity, reorder_level))
+            # Handle image upload
+            image_file = request.files.get('image')
+            image_filename = None  # Default if no image is uploaded
+
+            if image_file and allowed_file(image_file.filename):
+                filename = secure_filename(image_file.filename)
+                image_filename = f"{random_num}_{filename}"  # Rename with SKU to avoid conflicts
+                image_path = os.path.join(UPLOAD_FOLDER, image_filename)
+                image_file.save(image_path)  # Save image
+
+            # Insert new product into the database
+            cursor.execute('''INSERT INTO product_list 
+                (category_id, sku, price, name, description, quantity, reorder_level, image) 
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)''', 
+                (category_id, sku, price, name, description, quantity, reorder_level, image_filename))
+            
             connection.commit()
-            flash("You have successfully registered a product!")
+            flash("Product successfully added!", "success")
 
     cursor.close()
     connection.close()
 
-    # Pass the categories and random SKU to the template
-    return render_template('product/add_product.html',random_num=random_num, username=session['username'],categories=categories)
+    return render_template('product/add_product.html', random_num=random_num, username=session['username'], categories=categories)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+UPLOAD_FOLDER = 'static/uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+# Ensure the upload folder exists
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+def allowed_file(filename):
+    """Check if the uploaded file has a valid extension."""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/edit_product/<int:product_id>', methods=['GET', 'POST'])
 def edit_product(product_id):
@@ -543,18 +704,26 @@ def edit_product(product_id):
         except ValueError:
             quantity = 0  # Default to 0 if the quantity is invalid
 
-        # Determine the change in quantity
-        quantity_change = quantity - product['quantity']  # Updated quantity - current quantity
+        # Handle image upload
+        image_filename = product['image']  # Default to existing image if no new one is uploaded
+        image_file = request.files.get('image')
 
-        # Update the product data in the database
+        if image_file and allowed_file(image_file.filename):
+            filename = secure_filename(image_file.filename)
+            image_filename = f"{product_id}_{filename}"  # Rename with product ID to avoid conflicts
+            image_path = os.path.join(UPLOAD_FOLDER, image_filename)
+            image_file.save(image_path)  # Save new image
+
+        # Update the product data in the database, including the image filename
         cursor.execute(''' 
             UPDATE product_list
             SET category_id = %s, sku = %s, price = %s, name = %s, description = %s,
-                quantity = %s, reorder_level = %s, updated_at = CURRENT_TIMESTAMP
+                quantity = %s, reorder_level = %s, image = %s, updated_at = CURRENT_TIMESTAMP
             WHERE ProductID = %s
-        ''', (category_id, sku, price, name, description, quantity, reorder_level, product_id))
+        ''', (category_id, sku, price, name, description, quantity, reorder_level, image_filename, product_id))
 
         # Add a new log entry to the inventory_logs table
+        quantity_change = quantity - product['quantity']  # Updated quantity - current quantity
         cursor.execute(''' 
             INSERT INTO inventory_logs (product_id, quantity_change, log_date, reason)
             VALUES (%s, %s, CURRENT_TIMESTAMP, %s)
@@ -575,6 +744,25 @@ def edit_product(product_id):
 
     # Render the edit product page and pass product data and categories for the form
     return render_template('product/edit_product.html', username=session['username'], product=product, categories=categories)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -634,17 +822,17 @@ def restock_product():
 
 
 @app.route('/sale', methods=['GET'])
-def practice():
+def sale():
     try:
         connection = get_db_connection()
         # Create a cursor to execute SQL queries
         cursor = connection.cursor(dictionary=True)
 
         # Fetch customer and product data
-        cursor.execute('SELECT * FROM customer_list')
+        cursor.execute('SELECT * FROM customer_list order by name')
         customers = cursor.fetchall()
 
-        cursor.execute('SELECT * FROM product_list')
+        cursor.execute('SELECT * FROM product_list order by name')
         products = cursor.fetchall()
 
         # Close the cursor and connection
@@ -932,10 +1120,20 @@ def edit_user(id):
         username = request.form['username']
         password = request.form['password']
         role = request.form['role']
+        
+        # Check if the password is empty; if it is, use the existing password
+        if not password:
+            cursor.execute('SELECT password FROM users WHERE id = %s', (id,))
+            result = cursor.fetchone()
+            password = result['password']  # Keep the old password if not provided
+        
+        # Hash the password before updating
+        from werkzeug.security import generate_password_hash
+        hashed_password = generate_password_hash(password)
 
         try:
             cursor.execute('UPDATE users SET username = %s, password = %s, role = %s WHERE id = %s',
-                           (username, password, role, id))
+                           (username, hashed_password, role, id))
             connection.commit()
             flash('User updated successfully!', 'success')
         except mysql.connector.Error as err:
@@ -948,9 +1146,26 @@ def edit_user(id):
     
     cursor.execute('SELECT * FROM users WHERE id = %s', (id,))
     user = cursor.fetchone()
+    
+    # If no user found, redirect to a safe page or show an error
+    if user is None:
+        flash('User not found', 'danger')
+        return redirect(url_for('index'))
+    
     cursor.close()
     connection.close()
-    return render_template('user_accounts/edit_user.html', username=session['username'],user=user)
+    
+    return render_template('user_accounts/edit_user.html', username=session['username'], user=user)
+
+
+
+
+
+
+
+
+
+
 
 @app.route('/delete_user/<int:id>', methods=['GET'])
 def delete_user(id):

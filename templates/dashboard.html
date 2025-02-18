@@ -1,74 +1,73 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="app-content"> <!-- Begin::Container -->
-    <div class="container-fluid"> <!-- Begin::Row -->
-        <div class="row justify-content-center"> <!-- Begin::Row -->
+<div class="app-content">
+    <!-- Container for the page content -->
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            
+            <!-- Info Boxes Row -->
+            <div class="row">
+                <!-- Total Amount Today -->
+                <div class="col-12 col-sm-6 col-md-3">
+                    <div class="info-box">
+                        <span class="info-box-icon text-bg-primary shadow-sm">
+                            <i class="bi bi-wallet2"></i> <!-- Wallet icon for "Total Amount" -->
+                        </span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Total Amount Today</span>
+                            <span class="info-box-number">{{ total_sales_today }} <small>UGX</small></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Highest Sale Today -->
+                <div class="col-12 col-sm-6 col-md-3">
+                    <div class="info-box">
+                        <span class="info-box-icon text-bg-danger shadow-sm">
+                            <i class="bi bi-cash-stack"></i> <!-- Cash stack icon for "Highest Sale" -->
+                        </span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Highest Sale Today</span>
+                            <span class="info-box-number">{{ most_sold_product }}</span>
+                        </div>
+                    </div>
+                </div>
 
-           <!-- Info Boxes Row -->
-<div class="row">
-    <!-- Total Amount Today -->
-    <div class="col-12 col-sm-6 col-md-3">
-        <div class="info-box"> 
-            <span class="info-box-icon text-bg-primary shadow-sm"> 
-                <i class="bi bi-wallet2"></i> <!-- Changed to wallet icon for "Total Amount" -->
-            </span>
-            <div class="info-box-content"> 
-                <span class="info-box-text">Total Amount Today</span> 
-                <span class="info-box-number">{{total_sales_today}} <small>UGX</small></span> 
+                <!-- Sales Quantity Today -->
+                <div class="col-12 col-sm-6 col-md-3">
+                    <div class="info-box">
+                        <span class="info-box-icon text-bg-success shadow-sm">
+                            <i class="bi bi-cart-check"></i> <!-- Cart check icon for "Sales Quantity" -->
+                        </span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Sales Quantity Today</span>
+                            <span class="info-box-number">760</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Yesterday's Sales -->
+                <div class="col-12 col-sm-6 col-md-3">
+                    <div class="info-box">
+                        <span class="info-box-icon text-bg-warning shadow-sm">
+                            <i class="bi bi-graph-up"></i> <!-- Graph icon for "Yesterday's Sales" -->
+                        </span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Yesterday's Sales</span>
+                            <span class="info-box-number">2,000</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    
-    <!-- Biggest Sale Today -->
-    <div class="col-12 col-sm-6 col-md-3">
-        <div class="info-box"> 
-            <span class="info-box-icon text-bg-danger shadow-sm"> 
-                <i class="bi bi-cash-stack"></i> <!-- Changed to cash stack for "Biggest Sale" -->
-            </span>
-            <div class="info-box-content"> 
-                <span class="info-box-text">Highest Sale Today</span> 
-                <span class="info-box-number">{{ most_sold_product}}</span> 
-            </div>
-        </div>
-    </div>
 
-    <!-- Sales Quantity Today -->
-    <div class="col-12 col-sm-6 col-md-3">
-        <div class="info-box"> 
-            <span class="info-box-icon text-bg-success shadow-sm"> 
-                <i class="bi bi-cart-check"></i> <!-- Changed to cart check for "Sales Quantity" -->
-            </span>
-            <div class="info-box-content"> 
-                <span class="info-box-text">Sales Quantity Today</span> 
-                <span class="info-box-number">760</span> 
-            </div>
-        </div>
-    </div>
-
-    <!-- Yesterday's Sales -->
-    <div class="col-12 col-sm-6 col-md-3">
-        <div class="info-box"> 
-            <span class="info-box-icon text-bg-warning shadow-sm"> 
-                <i class="bi bi-graph-up"></i> <!-- Changed to graph icon for "Yesterday's Sales" -->
-            </span>
-            <div class="info-box-content"> 
-                <span class="info-box-text">Yesterday's Sales</span> 
-                <span class="info-box-number">2,000</span> 
-            </div>
-        </div>
-    </div>
-</div> <!-- /.row -->
-
-<!-- Empty Column Placeholder -->
-<div class="col-lg-3 col-6"> <!-- Empty column -->
-</div> <!-- End::Col -->
-
+            <!-- Empty Column Placeholder for Layout Consistency -->
+            <div class="col-lg-3 col-6"></div>
 
         </div> <!-- End::Row -->
 
         <!-- Statistics Card -->
-        <div class="row justify-content-center"> <!-- Center the row -->
+        <div class="row justify-content-center">
             <div class="card mb-4">
                 <div class="card-header">
                     <h3 class="card-title">Statistics</h3>
@@ -81,17 +80,17 @@
                             <i class="bi bi-x-lg"></i>
                         </button>
                     </div>
-                </div> <!-- /.card-header -->
+                </div>
 
                 <div class="card-body">
                     <div class="row justify-content-center">
                         <div class="col-5">
-                            <div id="pie-chart"></div> <!-- Pie chart placeholder -->
+                            <div id="pie-chart"></div> <!-- Placeholder for Pie Chart -->
                         </div>
                     </div>
-                </div> <!-- /.card-body -->
-            </div> <!-- /.card -->
-        </div> <!-- /.row -->
+                </div>
+            </div>
+        </div>
 
     </div> <!-- End::Container -->
 </div> <!-- End::App Content -->
@@ -103,7 +102,6 @@
     fetch('/poll_data')
     .then(response => response.json())
     .then(data => {
-        // Get the labels and series from the response data
         const pie_chart_options = {
             series: data.series,
             chart: {
@@ -111,10 +109,10 @@
             },
             labels: data.labels,  // Labels for the chart (option_text)
             dataLabels: {
-                enabled: true,  // Enable labels on the chart
+                enabled: true,
                 style: {
-                    fontSize: '14px',  // Customize font size for the labels
-                    fontWeight: 'bold',  // Optionally make labels bold
+                    fontSize: '14px',  // Font size for labels
+                    fontWeight: 'bold',  // Bold labels
                 },
                 dropShadow: {
                     enabled: true,
@@ -125,12 +123,7 @@
                 }
             },
             colors: [
-                "#0d6efd", // Example color for the segments
-                "#20c997",
-                "#ffc107",
-                "#d63384",
-                "#6f42c1",
-                "#adb5bd",
+                "#0d6efd", "#20c997", "#ffc107", "#d63384", "#6f42c1", "#adb5bd"
             ],
         };
 

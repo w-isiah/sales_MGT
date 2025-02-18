@@ -2,6 +2,9 @@
 
 {% block content %}
 
+<!-- Include Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+
 <!-- Point of Sale Card -->
 <div class="card mb-4">
   <div class="card-header">
@@ -23,7 +26,6 @@
   </div> <!-- /.card-header -->
 
   <div class="card-body">
-    <!-- POS Content Block -->
     <div class="row">
       <!-- Left Section: Customer & Product Selection -->
       <div class="col-md-4">
@@ -33,10 +35,10 @@
           <div class="control-group mb-3">
             <label for="customer-id" class="control-label">Customer</label>
             <div class="controls">
-              <select id="customer-id" name="customer-id" class="form-control">
+              <select id="customer-id" name="customer-id" class="form-control select2">
                 <option value="" disabled selected>Select Customer</option>
                 {% for i in customers %}
-                  <option value="{{ i.CustomerID }}">{{ i.name }}</option>
+                <option value="{{ i.CustomerID }}">{{ i.name }}</option>
                 {% endfor %}
               </select>
             </div>
@@ -46,10 +48,10 @@
           <div class="control-group mb-3">
             <label for="product-id" class="control-label">Product</label>
             <div class="controls">
-              <select id="product-id" name="product-id" class="form-control">
+              <select id="product-id" name="product-id" class="form-control select2">
                 <option value="" disabled selected>Select Product</option>
                 {% for i in products %}
-                  <option data-available="{{ i.quantity }}" data-price="{{ i.price }}" value="{{ i.ProductID }}">{{ i.name }}</option>
+                <option data-available="{{ i.quantity }}" data-price="{{ i.price }}" value="{{ i.ProductID }}">{{ i.name }}</option>
                 {% endfor %}
               </select>
             </div>
@@ -60,7 +62,6 @@
             <label for="product-qty" class="control-label">Quantity</label>
             <div class="controls">
               <input id="product-qty" type="number" min="1" name="quantity" class="form-control" placeholder="Enter Quantity" required>
-              <!-- Display the available quantity dynamically -->
               <small id="available-qty-info" class="form-text text-muted">Available: 0</small>
             </div>
           </div>
@@ -75,7 +76,7 @@
 
           <!-- Add Item Button -->
           <div class="form-actions">
-            <button type="button" id="add_item" class="btn btn-sm btn-primary" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">Add to Cart</button> 
+            <button type="button" id="add_item" class="btn btn-sm btn-primary">Add to Cart</button> 
           </div>
 
         </form>
@@ -85,25 +86,22 @@
       <div class="col-md-8">
         <h4>Cart Summary</h4>
         <div id="cart-list">
-          <!-- Cart Table -->
           <table id="cart-table" class="table table-striped mb-3">
             <thead>
               <tr>
-                <th style="width: 30%;">Product</th>
-                <th style="width: 20%;">Quantity</th>
-                <th style="width: 20%;">Total Price</th>
-                <th style="width: 20%;">Discount (%)</th>
-                <th style="width: 20%;">Discounted Price</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Total Price</th>
+                <th>Discount (%)</th>
+                <th>Discounted Price</th>
+                <th>Action</th>
               </tr>
             </thead>
-            <tbody id="item-list">
-              <!-- Items will be dynamically added here -->
-            </tbody>
+            <tbody id="item-list"></tbody>
           </table>
 
-          <!-- Total Price Display -->
           <div class="total-price">
-            <strong>Total: </strong><span id="total-price">0.00/=</span>
+            <strong>Total: </strong><span id="total-price">0.00 Ugx</span>
           </div>
 
           <!-- Amount Tendered Input -->
@@ -116,12 +114,12 @@
 
           <!-- Change Display -->
           <div class="total-price">
-            <strong>Change: </strong><span id="change">0.00/=</span>
+            <strong>Change: </strong><span id="change">0.00 Ugx</span>
           </div>
 
           <!-- Checkout Button -->
           <div class="form-actions">
-            <button type="button" id="checkout" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;" class="btn btn-sm btn-success">Checkout</button>
+            <button type="button" id="checkout" class="btn btn-sm btn-success">Checkout</button>
           </div>
 
         </div>
@@ -130,148 +128,221 @@
   </div> <!-- /.card-body -->
 </div> <!-- /.card -->
 
-<!-- JavaScript Block -->
+<!-- Include Select2 and jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+<!-- Initialize Select2 -->
 <script>
   $(document).ready(function() {
-    let totalAmount = 0; // Variable to keep track of total price
+    $('select').select2({
+      placeholder: "Search...",
+      allowClear: true
+    });
 
-    // Handle product selection
+    // Handle product selection change
     $('#product-id').change(function() {
       const selectedOption = $(this).find('option:selected');
       const availableQty = selectedOption.data('available');
-      const price = selectedOption.data('price');
-
-      // Display available quantity
       $('#available-qty-info').text(`Available: ${availableQty}`);
-
-      // Set the max value of the quantity input to the available quantity
       $('#product-qty').attr('max', availableQty);
     });
 
+
+
+
+
+
+
+let totalAmount = 0; // Variable to keep track of total price
+
+    // Handle product selection
+$('#product-id').change(function() {
+  const selectedOption = $(this).find('option:selected');
+  const availableQty = selectedOption.data('available');
+  const price = selectedOption.data('price');
+
+      // Display available quantity
+  $('#available-qty-info').text(`Available: ${availableQty}`);
+
+      // Set the max value of the quantity input to the available quantity
+  $('#product-qty').attr('max', availableQty);
+});
+
     // Handle Add to Cart button click
-    $('#add_item').click(function() {
-      const productSelect = $('#product-id');
-      const quantityInput = $('#product-qty');
-      const quantity = parseInt(quantityInput.val(), 10);
-      const discountInput = $('#discount');
-      const discount = parseFloat(discountInput.val()) || 0;
+$('#add_item').click(function() {
+  const productSelect = $('#product-id');
+  const quantityInput = $('#product-qty');
+  const quantity = parseInt(quantityInput.val(), 10);
+  const discountInput = $('#discount');
+  const discount = parseFloat(discountInput.val()) || 0;
 
-      const selectedOption = productSelect.find('option:selected');
-      const productName = selectedOption.text();
-      const availableQty = selectedOption.data('available');
-      const price = selectedOption.data('price');
+  const selectedOption = productSelect.find('option:selected');
+  const productName = selectedOption.text();
+  const availableQty = selectedOption.data('available');
+  const price = selectedOption.data('price');
 
-      if (!productName) {
-        alert("Please select a product.");
-        return;
-      }
+  if (!productName) {
+    alert("Please select a product.");
+    return;
+  }
 
       // Validate quantity
-      if (isNaN(quantity) || quantity < 1 || quantity > availableQty) {
-        alert(`Invalid quantity. Please enter a valid quantity between 1 and ${availableQty}.`);
-        return;
-      }
+  if (isNaN(quantity) || quantity < 1 || quantity > availableQty) {
+    alert(`Invalid quantity. Please enter a valid quantity between 1 and ${availableQty}.`);
+    return;
+  }
 
       // Validate price
-      if (price == null || price == undefined || price <= 0) {
-        alert("Invalid product price. Please select a valid product.");
+  if (price == null || price == undefined || price <= 0) {
+    alert("Invalid product price. Please select a valid product.");
+    return;
+  }
+
+      // Calculate total price for the item
+  const totalPrice = price * quantity;
+
+      // Apply discount
+  const discountAmount = (totalPrice * discount) / 100;
+  const discountedPrice = totalPrice - discountAmount;
+
+      // Add item to the cart table
+  const row = $('<tr></tr>') 
+        .data('product-id', selectedOption.val())  // Store the ProductID for later use
+        .append(`<td>${productName}</td>`)
+        .append(`<td><input type="number" class="form-control cart-qty" value="${quantity}" min="1" max="${availableQty}" data-price="${price}" data-product-id="${selectedOption.val()}"></td>`)
+        .append(`<td class="price">${totalPrice.toFixed(2)} Ugx</td>`)
+        .append(`<td class="item-discount">${discount.toFixed(2)}%</td>`)
+        .append(`<td class="discounted-price">${discountedPrice.toFixed(2)} Ugx</td>`)
+        .append(`<td><button class="btn btn-sm btn-danger remove-item">Remove</button></td>`);
+
+        $('#item-list').append(row);
+
+      // Update total amount
+        totalAmount += discountedPrice;
+        $('#total-price').text(`${totalAmount.toFixed(2)} Ugx`);
+
+      // Reset the quantity and discount inputs after adding the item
+        quantityInput.val('');
+        discountInput.val('');
+      });
+
+    // Update total price and quantity when a cart quantity is changed
+$(document).on('change', '.cart-qty', function() {
+  const newQuantity = parseInt($(this).val(), 10);
+  const maxQuantity = parseInt($(this).attr('max'), 10);
+  const price = parseFloat($(this).data('price'));
+
+      // Validate quantity
+  if (newQuantity < 1 || newQuantity > maxQuantity) {
+    alert(`Quantity must be between 1 and ${maxQuantity}.`);
+        $(this).val(1); // Reset to 1 if invalid
         return;
       }
 
-      // Calculate total price for the item
-      const totalPrice = price * quantity;
-
-      // Apply discount
+      // Recalculate the total price for the item
+      const totalPrice = price * newQuantity;
+      const discount = parseFloat($(this).closest('tr').find('.item-discount').text());
       const discountAmount = (totalPrice * discount) / 100;
       const discountedPrice = totalPrice - discountAmount;
 
-      // Add item to the cart table
-      const row = $('<tr></tr>')
-        .data('product-id', selectedOption.val())  // Store the ProductID for later use
-        .append(`<td>${productName}</td>`)
-        .append(`<td class="item-quantity">${quantity}</td>`)  <!-- Display Quantity -->
-        .append(`<td class="price">${totalPrice.toFixed(2)}/=</td>`)
-        .append(`<td class="item-discount">${discount.toFixed(2)}%</td>`)
-        .append(`<td class="discounted-price">$${discountedPrice.toFixed(2)}</td>`);
+      // Update the item's total price and discounted price
+      $(this).closest('tr').find('.price').text(`${totalPrice.toFixed(2)} Ugx`);
+      $(this).closest('tr').find('.discounted-price').text(`${discountedPrice.toFixed(2)} Ugx`);
 
-      $('#item-list').append(row);
-
-      // Update total amount
-      totalAmount += discountedPrice;
-      $('#total-price').text(`${totalAmount.toFixed(2)}/=`);
-
-      // Reset the quantity and discount inputs after adding the item
-      quantityInput.val('');
-      discountInput.val('');
+      // Recalculate the total amount
+      totalAmount = 0;
+      $('#item-list tr').each(function() {
+        totalAmount += parseFloat($(this).find('.discounted-price').text());
+      });
+      $('#total-price').text(`${totalAmount.toFixed(2)} Ugx`);
     });
 
+    // Remove item from the cart
+$(document).on('click', '.remove-item', function() {
+  const row = $(this).closest('tr');
+  const discountedPrice = parseFloat(row.find('.discounted-price').text());
+  
+      // Update total amount
+  totalAmount -= discountedPrice;
+  $('#total-price').text(`${totalAmount.toFixed(2)} Ugx`);
+  
+      // Remove the row from the cart
+  row.remove();
+});
+
     // Handle Amount Tendered input change and calculate Change
-    $('#amount-tendered').keyup(function() {
-      const amountTendered = parseFloat($(this).val()) || 0;
-      const change = amountTendered - totalAmount;
-      if (change < 0) {
-        $('#change').text(`$0.00`); // No negative change
+$('#amount-tendered').keyup(function() {
+  const amountTendered = parseFloat($(this).val()) || 0;
+  const change = amountTendered - totalAmount;
+  if (change < 0) {
+        $('#change').text(`0.00 Ugx`); // No negative change
       } else {
-        $('#change').text(`$${change.toFixed(2)}`);
+        $('#change').text(`${change.toFixed(2)} Ugx`);
       }
     });
 
     // Handle Checkout button click
-    $('#checkout').click(function() {
-      if (totalAmount > 0) {
-        const amountTendered = parseFloat($('#amount-tendered').val()) || 0;
-        if (amountTendered < totalAmount) {
-          alert('Insufficient amount tendered. Please enter a sufficient amount.');
-        } else {
-          const customerID = $('#customer-id').val();
-          const cartItems = [];
-          
-          $('#cart-table tbody tr').each(function () {
-            const productID = $(this).data('product-id');
-            const quantity = parseInt($(this).find('.item-quantity').text());
-            const price = parseFloat($(this).find('.price').text().replace('$', ''));
-            const discount = parseFloat($(this).find('.item-discount').text().replace('%', ''));
-            const discountedPrice = parseFloat($(this).find('.discounted-price').text().replace('$', ''));
-            
-            cartItems.push({
-              product_id: productID,
-              quantity: quantity,
-              price: price,
-              discount: discount,
-              total_price: price * quantity,
-              discounted_price: discountedPrice
-            });
-          });
+$('#checkout').click(function() {
+  if (totalAmount > 0) {
+    const amountTendered = parseFloat($('#amount-tendered').val()) || 0;
+    if (amountTendered < totalAmount) {
+      alert('Insufficient amount tendered. Please enter a sufficient amount.');
+    } else {
+      const customerID = $('#customer-id').val();
+      const cartItems = [];
+      
+      $('#cart-table tbody tr').each(function () {
+        const productID = $(this).data('product-id');
+        const quantity = parseInt($(this).find('.cart-qty').val());
+        const price = parseFloat($(this).find('.price').text().replace(' Ugx', ''));
+        const discount = parseFloat($(this).find('.item-discount').text().replace('%', ''));
+        const discountedPrice = parseFloat($(this).find('.discounted-price').text().replace(' Ugx', ''));
+        
+        cartItems.push({
+          product_id: productID,
+          quantity: quantity,
+          price: price,
+          discount: discount,
+          total_price: price * quantity,
+          discounted_price: discountedPrice
+        });
+      });
 
-          $.ajax({
-            url: '/save_sale',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({
-              customer_id: customerID,
-              cart_items: cartItems,
-              total_price: totalAmount,
-              discounted_price: totalAmount // assuming no extra discount for whole sale
-            }),
-            success: function(response) {
-              alert(response.message);
-              // Reset the form and cart after successful checkout
-              $('#pos-form')[0].reset();
-              $('#item-list').empty();
-              $('#total-price').text('$0.00');
-              $('#change').text('$0.00');
-            },
-            error: function(error) {
-              alert('Error: ' + error.responseJSON.message);
-            }
-          });
+      $.ajax({
+        url: '/save_sale',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+          customer_id: customerID,
+          cart_items: cartItems,
+          total_price: totalAmount,
+        discounted_price: totalAmount // assuming no extra discount for whole sale
+      }),
+        success: function(response) {
+          alert(response.message);
+        // Reset the form and cart after successful checkout
+          $('#pos-form')[0].reset();
+          $('#item-list').empty();
+          $('#total-price').text('0.00 Ugx');
+          $('#change').text('0.00 Ugx');
+
+        // Reload the page after a short delay
+          setTimeout(function() {
+            location.reload();
+        }, 1000); // Reload after 1 second
+        },
+        error: function(error) {
+          alert('Error: ' + error.responseJSON.message);
         }
-      } else {
-        alert('No items in the cart.');
-      }
-    });
-  });
+      });
+
+    }
+  } else {
+    alert('No items in the cart.');
+  }
+});
+});
 </script>
 
 {% endblock %}

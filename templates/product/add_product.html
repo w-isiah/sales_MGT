@@ -2,6 +2,13 @@
 
 {% block content %}
 
+<!-- Include Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- Include jQuery and Select2 JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
 <!-- Add Product Form -->
 <div class="card mb-4">
   <div class="card-header">
@@ -22,9 +29,9 @@
         <div class="row mb-3">
           <label for="category_id" class="col-sm-2 col-form-label">Category:</label>
           <div class="col-sm-10">
-            <select name="category_id" class="form-control">
+            <select name="category_id" class="form-control select2">
               {% for i in categories %}
-                <option value="{{ i.CategoryID }}">{{ i.CategoryID }} | {{ i.name }}</option>
+              <option value="{{ i.CategoryID }}">{{ i.CategoryID }} | {{ i.name }}</option>
               {% endfor %}
             </select>
           </div>
@@ -50,7 +57,7 @@
         <div class="row mb-3">
           <label for="price" class="col-sm-2 col-form-label">Price:</label>
           <div class="col-sm-10">
-            <input type="text" name="price" class="form-control" placeholder="Enter Product Buying Price" required />
+            <input type="text" name="price" class="form-control" placeholder="Enter Product Selling Price" required />
           </div>
         </div>
 
@@ -78,6 +85,18 @@
           </div>
         </div>
 
+
+
+        <!-- Image Upload Input -->
+        <div class="row mb-3">
+          <label for="image" class="col-sm-2 col-form-label">Product Image:</label>
+          <div class="col-sm-10">
+            <input type="file" name="image" class="form-control" accept="image/*" />
+          </div>
+        </div>
+
+
+
         <!-- Submit Button -->
         <div class="form-actions">
           <button type="submit" class="btn btn-sm btn-success">Save</button>
@@ -87,5 +106,12 @@
     </div>
   </div>
 </div> <!-- /.card-body -->
+
+<!-- Initialize Select2 -->
+<script>
+  $(document).ready(function() {
+    $('.select2').select2();
+  });
+</script>
 
 {% endblock %}
